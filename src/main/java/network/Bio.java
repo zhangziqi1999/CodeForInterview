@@ -17,7 +17,21 @@ public class Bio {
             // 建立连接
             Socket socket = serverSocket.accept();
             System.out.println("连接建立" + socket);
-            executorService.submit(new Task(socket));
+            executorService.submit(() -> {
+                try{
+                    InputStream inputStream = socket.getInputStream();
+                    OutputStream outputStream = socket.getOutputStream();
+                    byte[] buffer = new byte[100];
+                    while(inputStream.read(buffer) != -1){
+                        String message = new String(buffer, 0, buffer.length);
+                        System.out.println(message);
+                        outputStream.write(message.getBytes(StandardCharsets.UTF_8));
+                        outputStream.flush();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
