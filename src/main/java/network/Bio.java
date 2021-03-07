@@ -34,29 +34,4 @@ public class Bio {
             });
         }
     }
-
-    static class Task implements Runnable{
-        Socket socket;
-
-        public Task(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try{
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-                byte[] buffer = new byte[100];
-                while(inputStream.read(buffer) != -1){
-                    String message = new String(buffer, 0, buffer.length);
-                    System.out.println(message);
-                    outputStream.write(message.getBytes(StandardCharsets.UTF_8));
-                    outputStream.flush();
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
 }

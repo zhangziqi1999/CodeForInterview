@@ -8,6 +8,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ public class Nio {
                 if (selectionKey.isAcceptable()){
                     ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
                     SocketChannel client = server.accept();
+                    System.out.println("连接建立" + client);
                     client.configureBlocking(false);
                     client.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                 }
@@ -36,11 +38,16 @@ public class Nio {
                     SocketChannel client = (SocketChannel) selectionKey.channel();
                     ByteBuffer byteBuffer = ByteBuffer.allocate(1000);
                     client.read(byteBuffer);
+                    byteBuffer.flip();
                     selectionKey.attach(byteBuffer);
                 }
                 if (selectionKey.isWritable()){
                     SocketChannel client = (SocketChannel) selectionKey.channel();
                     ByteBuffer byteBuffer = (ByteBuffer) selectionKey.attachment();
+                    if(byteBuffer == null){
+                        continue;
+                    }
+                    System.out.println(new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.limit(), StandardCharsets.UTF_8));
                     while(byteBuffer.hasRemaining()){
                         if(client.write(byteBuffer) == 0){
                             break;
